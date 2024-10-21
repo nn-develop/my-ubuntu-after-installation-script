@@ -33,7 +33,7 @@ To use this script, follow these steps:
   Navigate to the cloned directory:
 
   ```bash
-  cd post_install_script
+  cd <script-directory>
   ```
 
   Make the script executable:
