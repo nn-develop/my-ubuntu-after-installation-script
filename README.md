@@ -18,7 +18,7 @@ This script automates the post-installation setup for Ubuntu, making it quick an
   - Visual Studio Code (code editor, using Snap) with useful extensions
   - Postman (API development, using Snap)
   - Draw.io (diagramming tool, using Snap)
-- **Power Management Optimization**: Installs and configures TLP to enhance battery performance and addresses suspend issues on laptops with hybrid Intel + Nvidia graphics.
+- **Power Management Optimization**: Fixes black screen issue after hibernation by modifying kernel parameters for i915
 - **System Cleanup**: Automatically removes unnecessary packages to free up disk space and improve performance.
 
 ## Installation
@@ -26,27 +26,44 @@ This script automates the post-installation setup for Ubuntu, making it quick an
 To use this script, follow these steps:
 
 1. Clone the repository:
-  ```bash
-  git clone https://github.com/nn-develop/my-ubuntu-after-installation-script.git
-  ```
 
-  Navigate to the cloned directory:
+    ```bash
+    git clone https://github.com/nn-develop/my-ubuntu-after-installation-script.git
+    ```
 
-  ```bash
-  cd <script-directory>
-  ```
+2. Navigate to the cloned directory:
 
-  Make the script executable:
+    ```bash
+    cd <script-directory>
+    ```
 
-  ```bash
-  chmod +x post_install_script.sh
-  ```
+3. Make the script executable:
 
-  Run the script:
+    ```bash
+    chmod +x post_install_script.sh
+    ```
 
-  ```bash
-  ./post_install_script.sh
-  ```
+4. Adjust script to your system:
+
+    4.1. Find the UUID of your swap partition:
+
+        ```bash
+        sudo blkid | grep swap
+        ```
+
+    4.2. The script modifies the GRUB configuration to include the swap partition's UUID, which is required for proper hibernation functionality. You need to replace the UUID `UUID=d6feb52c-2bb7-41eb-807b-7723aff1c7f5` with your actual swap partition UUID in the following line:
+
+        ```bash
+        sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i915.enable_psr=0 resume=UUID=your-uuid-here"/' /etc/default/grub
+        ```
+
+5. Run the script:
+
+    ```bash
+    ./post_install_script.sh
+    ```
+
+6. Reboot the system after the script completes.
 
 ## Customization
 
@@ -55,7 +72,7 @@ You can modify the script to suit your personal needs by adding or removing appl
 ## Notes
 
 This script is optimized for Ubuntu systems, but it may work on other Debian-based distributions with minor modifications.
-For laptops with hybrid graphics (Intel + Nvidia), this script includes a fix for suspend issues by configuring TLP and adjusting power settings.
+For many laptops with Intel integrated graphics, this script includes a fix for black screen issues after hibernation.
 
 ## Contributions
 

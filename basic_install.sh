@@ -19,7 +19,7 @@ sudo snap install joplin-desktop
 
 # Install development tools: Git, Docker, Visual Studio Code, Postman
 echo "Installing development tools..."
-sudo apt install -y git docker.io docker-compose
+sudo apt install -y git docker.io docker-compose-v2 docker-buildx
 sudo snap install drawio
 
 # Add the current user to the Docker group to avoid needing 'sudo' for Docker commands
@@ -42,23 +42,17 @@ code --install-extension ms-python.python
 code --install-extension ms-python.black-formatter
 code --install-extension eamodio.gitlens
 code --install-extension github.copilot
-code --install-extension oliversen.chatgpt-docstrings
+code --install-extension njpwerner.autodocstring
 
 # Enable and start Docker service
 echo "Enabling and starting Docker service..."
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# Fix suspend problem on my notebook (due to hybrid graphics card - Intel + Nvidia)
-echo "Installing TLP for power management..."
-sudo apt install -y tlp tlp-rdw
-sudo systemctl enable tlp
-sudo tlp start
-
-# Modify /etc/systemd/logind.conf to use suspend instead of hibernation
-echo "Configuring suspend settings..."
-sudo sed -i 's/^#HandleLidSwitch=suspend/HandleLidSwitch=suspend/' /etc/systemd/logind.conf
-sudo sed -i 's/^#HandleLidSwitchDocked=suspend/HandleLidSwitchDocked=suspend/' /etc/systemd/logind.conf
+# Modify kernel parameters for i915 to fix black screen issue after hibernation
+echo "Modifying kernel parameters for i915 and hibernation..."
+sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i915.enable_psr=0 resume=UUID=d6feb52c-2bb7-41eb-807b-7723aff1c7f5"/' /etc/default/grub
+sudo update-grub
 
 # Clean up unnecessary packages
 echo "Cleaning up unnecessary packages..."
