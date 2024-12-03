@@ -11,11 +11,17 @@ sudo apt install -y \
     inkscape \
     scribus \
     pdfarranger \
-    remmina
+    remmina \
+    thunderbird \
+    xournalpp
 
 # Install Joplin (using AppImage as it's not available in the default Ubuntu repositories)
 echo "Installing Joplin..."
 sudo snap install joplin-desktop
+
+# Install LibreOffice (using snap)
+echo "Installing LibreOffice..."
+sudo snap install libreoffice
 
 # Install development tools: Git, Docker, Visual Studio Code, Postman
 echo "Installing development tools..."
