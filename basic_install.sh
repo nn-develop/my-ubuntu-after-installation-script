@@ -11,9 +11,12 @@ sudo apt install -y \
     inkscape \
     scribus \
     pdfarranger \
-    remmina \
+    # remmina \
     thunderbird \
-    xournalpp
+    xournalpp \
+    epodpisfs \
+    proton-authenticator \
+    meld
 
 # Install Joplin (using AppImage as it's not available in the default Ubuntu repositories)
 echo "Installing Joplin..."
@@ -22,6 +25,10 @@ sudo snap install joplin-desktop
 # Install LibreOffice (using snap)
 echo "Installing LibreOffice..."
 sudo snap install libreoffice
+
+# Install Brave browser (snap provides automatic updates)
+echo "Installing Brave browser..."
+sudo snap install brave
 
 # Install development tools: Git, Docker, Visual Studio Code, Postman
 echo "Installing development tools..."
@@ -47,7 +54,9 @@ code --install-extension cweijan.vscode-mysql-client2
 code --install-extension ms-python.python
 code --install-extension ms-python.black-formatter
 code --install-extension eamodio.gitlens
+code --install-extension github.codespaces
 code --install-extension github.copilot
+code --install-extension github.copilot-chat
 code --install-extension njpwerner.autodocstring
 
 # Enable and start Docker service
@@ -55,10 +64,14 @@ echo "Enabling and starting Docker service..."
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# Modify kernel parameters for i915 to fix black screen issue after hibernation
+# Modify kernel parameters for i915 to fix black screen issue after hibernation (works perfectly on SF514-52TP)
 echo "Modifying kernel parameters for i915 and hibernation..."
-sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i915.enable_psr=0 resume=UUID=d6feb52c-2bb7-41eb-807b-7723aff1c7f5"/' /etc/default/grub
+sudo bash -c 'if grep -q "^GRUB_CMDLINE_LINUX_DEFAULT=" /etc/default/grub; then sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash i915.enable_psr=0 mem_sleep_default=deep\"|" /etc/default/grub; else echo "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash i915.enable_psr=0 mem_sleep_default=deep\"" >> /etc/default/grub; fi'
 sudo update-grub
+
+# Force classic HDA driver and disable Intel DSP (for SF514-52TP audio)
+echo "Configuring ALSA to force HDA driver (Intel DSP off)..."
+sudo bash -c 'grep -qxF "options snd-intel-dspcfg dsp_driver=1" /etc/modprobe.d/alsa-base.conf || echo "options snd-intel-dspcfg dsp_driver=1" >> /etc/modprobe.d/alsa-base.conf'
 
 # Clean up unnecessary packages
 echo "Cleaning up unnecessary packages..."
